@@ -8,10 +8,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vedoveto.cursomc.domain.Pedido;
-import com.vedoveto.cursomc.domain.Pedido;
-import com.vedoveto.cursomc.domain.Pedido;
-import com.vedoveto.cursomc.domain.Pedido;
-import com.vedoveto.cursomc.domain.Pedido;
 import com.vedoveto.cursomc.services.PedidoService;
 
 @RestController
