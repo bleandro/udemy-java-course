@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.vedoveto.cursomc.domain.Cliente;
 import com.vedoveto.cursomc.domain.Pedido;
 
 public abstract class AbstractEmailService implements EmailService {
@@ -30,7 +31,10 @@ public abstract class AbstractEmailService implements EmailService {
 	public void sendOrderConfirmationEmail(Pedido obj) {
 		SimpleMailMessage sm = prepareSimpleMailMessageFromPedido(obj);
 		
-		// Start send mail Thread
+		sendEmailInternal(sm);
+	}
+
+	private void sendEmailInternal(SimpleMailMessage sm) {
 		{
 			Runnable runnable = () -> 
 			{ 
@@ -47,19 +51,22 @@ public abstract class AbstractEmailService implements EmailService {
 		{
 			MimeMessage mm = prepareMimeMessageFromPedido(obj);
 			
-			// Start send mail Thread
-			{
-				Runnable runnable = () -> 
-				{ 
-					sendHtmlEmail(mm); 
-				};
-				
-				new Thread(runnable).start();
-			}
+			sendHtmlEmailInternal(mm);
 		}
 		catch(MessagingException e)
 		{
 			sendOrderConfirmationEmail(obj);
+		}
+	}
+
+	private void sendHtmlEmailInternal(MimeMessage mm) {
+		{
+			Runnable runnable = () -> 
+			{ 
+				sendHtmlEmail(mm); 
+			};
+			
+			new Thread(runnable).start();
 		}
 	}
 
@@ -96,4 +103,25 @@ public abstract class AbstractEmailService implements EmailService {
 		
 		return templateEngine.process("email/confirmacaoPedido", context); 
 	}
+	
+	@Override
+	public void sendNewPasswordEmail(Cliente cliente, String newPass) {
+		SimpleMailMessage sm = prepareNewPasswordEmail(cliente, newPass);
+		
+		sendEmailInternal(sm);		
+	}
+
+	protected SimpleMailMessage prepareNewPasswordEmail(Cliente cliente, String newPass) {
+		SimpleMailMessage sm = new SimpleMailMessage();
+
+		sm.setTo(cliente.getEmail());
+		sm.setFrom(sender);
+		sm.setSubject("Solicitação de nova senha");
+		sm.setSentDate(new Date(System.currentTimeMillis()));
+
+		sm.setText("Nova senha: " + newPass);
+
+		return sm;
+	}
+	
 }
