@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.vedoveto.cursomc.security.JWTAuthenticateFilter;
+import com.vedoveto.cursomc.security.JWTAuthorizationFilter;
 import com.vedoveto.cursomc.security.JWTUtil;
 
 @Configuration
@@ -58,6 +59,7 @@ public class SecutiryConfig extends WebSecurityConfigurerAdapter {
 		    .anyRequest().authenticated();
 		
 		http.addFilter(new JWTAuthenticateFilter(authenticationManager(), jwtUtil));
+		http.addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtUtil, userDetailsService));
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 	
