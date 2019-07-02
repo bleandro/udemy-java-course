@@ -9,10 +9,7 @@
 .settings
 .springBeans
 .sts4-cache
-*/application-dev.properties
-*/application-prod.properties
-*/application-test.properties
-*/application.properties
+*.properties
 
 ### IntelliJ IDEA ###
 .idea
