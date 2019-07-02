@@ -1,5 +1,6 @@
 package com.vedoveto.cursomc.services;
 
+import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +8,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +35,9 @@ import com.vedoveto.cursomc.services.exceptions.ObjectNotFoundException;
 @Service
 public class ClienteService {
 	
+	@Value("${img.prefix.client.profile}")
+	private String prefix;
+	
 	@Autowired
 	private BCryptPasswordEncoder pe; 
 	
@@ -44,6 +49,9 @@ public class ClienteService {
 	
 	@Autowired
 	private S3Service s3Service;
+	
+	@Autowired
+	private ImageService imageService;
 	
 	public Cliente findById(Integer id) {
 		
@@ -119,12 +127,9 @@ public class ClienteService {
 		if (user == null)
 			throw new AuthorizationException("Acesso negado");		
 		
-		URI uri = s3Service.uploadFile(multipartFile);
+		BufferedImage jpgImage = imageService.getJpgImageFromFile(multipartFile);
+		String fileName = prefix + user.getId() + ".jpg";
 		
-		Cliente cli = findById(user.getId());
-		cli.setImageUrl(uri.toString());
-		clienteRepository.save(cli);
-		
-		return uri;
+		return s3Service.uploadFile(imageService.getInputStream(jpgImage, "jpg"), fileName, "image");
 	}
 }
